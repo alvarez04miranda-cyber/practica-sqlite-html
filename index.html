@@ -47,7 +47,7 @@
 <body class="min-h-screen bg-slate-100 text-slate-800 antialiased">
 
   <!-- ===================== ENCABEZADO ===================== -->
-  <header class="bg-indigo-700 text-white shadow-md sticky top-0 z-20">
+  <header class="bg-purple-700 text-white shadow-md sticky top-0 z-20">
     <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
       <div>
         <h1 class="text-lg sm:text-2xl font-bold leading-tight">📚 Registro de Estudiantes</h1>
@@ -63,7 +63,7 @@
 
     <!-- ===================== FORMULARIO DE REGISTRO ===================== -->
     <section class="bg-white rounded-2xl shadow p-4 sm:p-6">
-      <h2 class="text-base sm:text-lg font-semibold mb-4 text-slate-700">➕ Nuevo estudiante</h2>
+      <h2 class="text-base sm:text-lg font-semibold mb-4 text-slate-700" Nuevo Estudiante</h2>
 
       <!-- Este formulario no envía datos a ningún servidor: al hacer submit,
            JavaScript toma los valores y ejecuta un INSERT sobre la base de
@@ -96,7 +96,7 @@
     <!-- ===================== TABLA DE REGISTROS ===================== -->
     <section class="bg-white rounded-2xl shadow p-4 sm:p-6">
       <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
-        <h2 class="text-base sm:text-lg font-semibold text-slate-700">📋 Estudiantes registrados</h2>
+        <h2 class="text-base sm:text-lg font-semibold text-slate-700">Estudiantes Registrados</h2>
         <span id="contador" class="text-xs text-slate-400">0 registros</span>
       </div>
 
@@ -132,7 +132,7 @@
       <div class="flex flex-col sm:flex-row gap-3">
         <button id="btn-exportar"
           class="flex-1 bg-emerald-600 hover:bg-emerald-700 active:scale-95 transition text-white font-medium px-4 py-2.5 rounded-lg text-sm shadow">
-          ⬇️ Exportar DB (.sqlite)
+          Exportar DB (.sqlite)
         </button>
 
         <!-- El botón visible dispara un <input type="file"> oculto:
@@ -140,7 +140,7 @@
              diseño en vez del <input> nativo del navegador. -->
         <label for="input-cargar"
           class="flex-1 text-center cursor-pointer bg-slate-600 hover:bg-slate-700 active:scale-95 transition text-white font-medium px-4 py-2.5 rounded-lg text-sm shadow">
-          ⬆️ Cargar DB
+          Cargar DB
         </label>
         <input id="input-cargar" type="file" accept=".sqlite,.db,.sqlite3" class="hidden">
       </div>
