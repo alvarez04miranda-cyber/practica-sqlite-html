@@ -4,16 +4,27 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Registro de Estudiantes — Supabase (SQL en la Nube)</title>
+
+<!-- Tailwind CSS vía CDN: utilidades de diseño responsivo sin build step -->
 <script src="https://cdn.tailwindcss.com"></script>
+
 <!-- Cliente de Supabase vía CDN -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
+  /* Pequeños ajustes que Tailwind no cubre directamente */
   body { -webkit-tap-highlight-color: transparent; }
-  .toast { transition: opacity 0.3s ease, transform 0.3s ease; }
+  ::-webkit-scrollbar { height: 8px; width: 8px; }
+  ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 9999px; }
+  .toast {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
 </style>
 </head>
+
 <body class="min-h-screen bg-slate-100 text-slate-800 antialiased">
 
+  <!-- ===================== ENCABEZADO ===================== -->
   <header class="bg-emerald-700 text-white shadow-md sticky top-0 z-20">
     <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
       <div>
@@ -28,9 +39,10 @@
 
   <main class="max-w-5xl mx-auto p-4 space-y-6">
 
-    <!-- Formulario -->
+    <!-- ===================== FORMULARIO DE REGISTRO ===================== -->
     <section class="bg-white rounded-2xl shadow p-4 sm:p-6">
       <h2 class="text-base sm:text-lg font-semibold mb-4 text-slate-700">➕ Nuevo estudiante</h2>
+
       <form id="form-estudiante" class="grid grid-cols-1 sm:grid-cols-4 gap-3">
         <div class="sm:col-span-2">
           <label class="block text-xs font-medium text-slate-500 mb-1">Nombre</label>
@@ -56,7 +68,7 @@
       </form>
     </section>
 
-    <!-- Tabla -->
+    <!-- ===================== TABLA DE REGISTROS ===================== -->
     <section class="bg-white rounded-2xl shadow p-4 sm:p-6">
       <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
         <h2 class="text-base sm:text-lg font-semibold text-slate-700">📋 Estudiantes registrados</h2>
@@ -82,146 +94,151 @@
     </section>
   </main>
 
+  <!-- Notificación flotante (toast) para confirmar acciones -->
   <div id="toast" class="toast fixed bottom-4 left-1/2 -translate-x-1/2 opacity-0 pointer-events-none
        bg-slate-900 text-white text-sm px-4 py-2 rounded-full shadow-lg z-50"></div>
 
-  <!-- Lógica de Supabase -->
-  <script>
-    // PEGA AQUÍ TUS CREDENCIALES DE SUPABASE
-    const SUPABASE_URL = 'https://jfzmbttshakjqgygrctk.supabase.co';
+<script>
+/* ===========================================================================
+   LÓGICA DE CONEXIÓN CON SUPABASE (NUBE Y TIEMPO REAL)
+   =========================================================================== */
+
+// Tus credenciales configuradas correctamente (sin /rest/v1/ al final)
+const SUPABASE_URL = 'https://jfzmbttshakjqgygrctk.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impmem1idHRzaGFranFneWdyY3RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg3MDgxMzYsImV4cCI6MjEwNDI4NDEzNn0.L4AaYsCR77FHAb-_S84fnP0INgfl_RM3wO1sLe6ByAQ';
-    const { createClient } = supabase;
-    const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const dbStatusEl = document.getElementById('db-status');
-    const formEl = document.getElementById('form-estudiante');
-    const tablaBodyEl = document.getElementById('tabla-body');
-    const contadorEl = document.getElementById('contador');
-    const toastEl = document.getElementById('toast');
+const { createClient } = supabase;
+const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    function mostrarToast(mensaje) {
-      toastEl.textContent = mensaje;
-      toastEl.style.opacity = '1';
-      toastEl.style.transform = 'translate(-50%, -8px)';
-      clearTimeout(mostrarToast._t);
-      mostrarToast._t = setTimeout(() => {
-        toastEl.style.opacity = '0';
-        toastEl.style.transform = 'translate(-50%, 0)';
-      }, 1800);
-    }
+const dbStatusEl  = document.getElementById('db-status');
+const formEl      = document.getElementById('form-estudiante');
+const tablaBodyEl = document.getElementById('tabla-body');
+const contadorEl  = document.getElementById('contador');
+const toastEl     = document.getElementById('toast');
 
-    // Cargar los registros iniciales mediante una consulta SQL (equivalente a SELECT)
-    async function cargarEstudiantes() {
-      const { data, error } = await _supabase
-        .from('estudiantes')
-        .select('*')
-        .order('id', { ascending: false });
+function mostrarToast(mensaje) {
+  toastEl.textContent = mensaje;
+  toastEl.style.opacity = '1';
+  toastEl.style.transform = 'translate(-50%, -8px)';
+  clearTimeout(mostrarToast._t);
+  mostrarToast._t = setTimeout(() => {
+    toastEl.style.opacity = '0';
+    toastEl.style.transform = 'translate(-50%, 0)';
+  }, 1800);
+}
 
-      if (error) {
-        console.error(error);
-        dbStatusEl.textContent = '⚠️ Error al conectar';
-        mostrarToast('Error al cargar datos de Supabase');
-        return;
-      }
+// Cargar registros mediante SELECT de Supabase
+async function cargarEstudiantes() {
+  const { data, error } = await _supabase
+    .from('estudiantes')
+    .select('*')
+    .order('id', { ascending: false });
 
-      dbStatusEl.textContent = '✅ Conectado a Supabase (SQL)';
-      pintarTabla(data);
-    }
+  if (error) {
+    console.error(error);
+    dbStatusEl.textContent = '⚠️ Error al conectar';
+    mostrarToast('Error al cargar datos de Supabase');
+    return;
+  }
 
-    function pintarTabla(filas) {
-      tablaBodyEl.innerHTML = '';
-      contadorEl.textContent = `${filas.length} registro${filas.length === 1 ? '' : 's'}`;
+  dbStatusEl.textContent = '✅ Conectado a Supabase (SQL)';
+  pintarTabla(data);
+}
 
-      if (filas.length === 0) {
-        tablaBodyEl.innerHTML = `<tr><td colspan="5" class="px-3 py-6 text-center text-slate-400">Aún no hay estudiantes registrados.</td></tr>`;
-        return;
-      }
+function pintarTabla(filas) {
+  tablaBodyEl.innerHTML = '';
+  contadorEl.textContent = `${filas.length} registro${filas.length === 1 ? '' : 's'}`;
 
-      for (const row of filas) {
-        const tr = document.createElement('tr');
-        tr.className = 'hover:bg-slate-50';
-        tr.innerHTML = `
-          <td class="px-3 py-2 text-slate-400">${row.id}</td>
-          <td class="px-3 py-2 font-medium">${escapeHtml(row.nombre)}</td>
-          <td class="px-3 py-2">${escapeHtml(row.materia)}</td>
-          <td class="px-3 py-2">
-            <span class="px-2 py-0.5 rounded-full text-xs font-semibold ${colorNota(row.nota)}">${row.nota}</span>
-          </td>
-          <td class="px-3 py-2 text-right">
-            <button data-id="${row.id}" class="btn-borrar text-red-500 hover:text-red-700 text-xs font-medium">
-              Eliminar
-            </button>
-          </td>`;
-        tablaBodyEl.appendChild(tr);
-      }
+  if (filas.length === 0) {
+    tablaBodyEl.innerHTML = `<tr><td colspan="5" class="px-3 py-6 text-center text-slate-400">Aún no hay estudiantes registrados.</td></tr>`;
+    return;
+  }
 
-      document.querySelectorAll('.btn-borrar').forEach(btn => {
-        btn.addEventListener('click', () => eliminarEstudiante(Number(btn.dataset.id)));
-      });
-    }
+  for (const row of filas) {
+    const tr = document.createElement('tr');
+    tr.className = 'hover:bg-slate-50';
+    tr.innerHTML = `
+      <td class="px-3 py-2 text-slate-400">${row.id}</td>
+      <td class="px-3 py-2 font-medium">${escapeHtml(row.nombre)}</td>
+      <td class="px-3 py-2">${escapeHtml(row.materia)}</td>
+      <td class="px-3 py-2">
+        <span class="px-2 py-0.5 rounded-full text-xs font-semibold ${colorNota(row.nota)}">${row.nota}</span>
+      </td>
+      <td class="px-3 py-2 text-right">
+        <button data-id="${row.id}" class="btn-borrar text-red-500 hover:text-red-700 text-xs font-medium">
+          Eliminar
+        </button>
+      </td>`;
+    tablaBodyEl.appendChild(tr);
+  }
 
-    // Insertar un registro (equivalente a INSERT INTO)
-    formEl.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const nombre = document.getElementById('input-nombre').value.trim();
-      const materia = document.getElementById('input-materia').value.trim();
-      const nota = Number(document.getElementById('input-nota').value);
+  document.querySelectorAll('.btn-borrar').forEach(btn => {
+    btn.addEventListener('click', () => eliminarEstudiante(Number(btn.dataset.id)));
+  });
+}
 
-      if (!nombre || !materia || Number.isNaN(nota)) return;
+// Insertar registro (INSERT INTO)
+formEl.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const nombre = document.getElementById('input-nombre').value.trim();
+  const materia = document.getElementById('input-materia').value.trim();
+  const nota = Number(document.getElementById('input-nota').value);
 
-      const { error } = await _supabase
-        .from('estudiantes')
-        .insert([{ nombre, materia, nota }]);
+  if (!nombre || !materia || Number.isNaN(nota)) return;
 
-      if (error) {
-        console.error(error);
-        mostrarToast('Error al guardar en Supabase');
-        return;
-      }
+  const { error } = await _supabase
+    .from('estudiantes')
+    .insert([{ nombre, materia, nota }]);
 
-      formEl.reset();
-      document.getElementById('input-nombre').focus();
-      mostrarToast('Guardado en Supabase ✔');
-    });
+  if (error) {
+    console.error(error);
+    mostrarToast('Error al guardar en Supabase');
+    return;
+  }
 
-    // Eliminar un registro (equivalente a DELETE FROM)
-    async function eliminarEstudiante(id) {
-      const { error } = await _supabase
-        .from('estudiantes')
-        .delete()
-        .eq('id', id);
+  formEl.reset();
+  document.getElementById('input-nombre').focus();
+  mostrarToast('Guardado en Supabase ✔');
+});
 
-      if (error) {
-        console.error(error);
-        mostrarToast('Error al eliminar');
-        return;
-      }
+// Eliminar registro (DELETE FROM)
+async function eliminarEstudiante(id) {
+  const { error } = await _supabase
+    .from('estudiantes')
+    .delete()
+    .eq('id', id);
 
-      mostrarToast('Registro eliminado');
-    }
+  if (error) {
+    console.error(error);
+    mostrarToast('Error al eliminar');
+    return;
+  }
 
-    function colorNota(nota) {
-      if (nota >= 51) return 'bg-emerald-100 text-emerald-700';
-      if (nota >= 30) return 'bg-amber-100 text-amber-700';
-      return 'bg-red-100 text-red-700';
-    }
+  mostrarToast('Registro eliminado');
+}
 
-    function escapeHtml(texto) {
-      const div = document.createElement('div');
-      div.textContent = texto;
-      return div.innerHTML;
-    }
+function colorNota(nota) {
+  if (nota >= 51) return 'bg-emerald-100 text-emerald-700';
+  if (nota >= 30) return 'bg-amber-100 text-amber-700';
+  return 'bg-red-100 text-red-700';
+}
 
-    // Escuchar cambios en TIEMPO REAL (Realtime) para que se actualice solo en celular y laptop
-    _supabase
-      .channel('public:estudiantes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'estudiantes' }, (payload) => {
-        cargarEstudiantes(); // Recarga la tabla automáticamente al haber cualquier cambio en la base de datos
-      })
-      .subscribe();
+function escapeHtml(texto) {
+  const div = document.createElement('div');
+  div.textContent = texto;
+  return div.innerHTML;
+}
 
-    // Cargar datos al iniciar la página
+// Escuchar cambios en tiempo real entre laptop y celular
+_supabase
+  .channel('public:estudiantes')
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'estudiantes' }, (payload) => {
     cargarEstudiantes();
-  </script>
+  })
+  .subscribe();
+
+// Cargar datos al iniciar
+cargarEstudiantes();
+</script>
 </body>
 </html>
