@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Registro de Estudiantes — Supabase (SQL en la Nube)</title>
+<title>Registro de Estudiantes (SQL en la Nube)</title>
 
 <!-- Tailwind CSS vía CDN: utilidades de diseño responsivo sin build step -->
 <script src="https://cdn.tailwindcss.com"></script>
@@ -28,8 +28,8 @@
   <header class="bg-emerald-700 text-white shadow-md sticky top-0 z-20">
     <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
       <div>
-        <h1 class="text-lg sm:text-2xl font-bold leading-tight">📚 Registro con Supabase (SQL)</h1>
-        <p class="text-emerald-200 text-xs sm:text-sm">Sincronización en tiempo real (Laptop & Celular)</p>
+        <h1 class="text-lg sm:text-2xl font-bold leading-tight">📚 Registro de Estudiantes (SQL)</h1>
+        <p class="text-emerald-200 text-xs sm:text-sm">SQLite corriendo 100% en tu navegador (sql.js)</p>
       </div>
       <span id="db-status" class="text-xs sm:text-sm bg-emerald-800/60 px-3 py-1 rounded-full whitespace-nowrap">
         Conectando a Supabase…
@@ -62,7 +62,7 @@
         <div class="sm:col-span-4 flex justify-end">
           <button type="submit"
             class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 active:scale-95 transition text-white font-medium px-5 py-2.5 rounded-lg text-sm shadow">
-            Guardar en Supabase
+            Guardar Estudiante
           </button>
         </div>
       </form>
@@ -87,7 +87,7 @@
             </tr>
           </thead>
           <tbody id="tabla-body" class="divide-y divide-slate-100">
-            <tr><td colspan="5" class="px-3 py-6 text-center text-slate-400">Cargando datos de Supabase…</td></tr>
+            <tr><td colspan="5" class="px-3 py-6 text-center text-slate-400">Cargando datos de SQLite…</td></tr>
           </tbody>
         </table>
       </div>
@@ -137,11 +137,11 @@ async function cargarEstudiantes() {
   if (error) {
     console.error(error);
     dbStatusEl.textContent = '⚠️ Error al conectar';
-    mostrarToast('Error al cargar datos de Supabase');
+    mostrarToast('Error al cargar datos de SQLite');
     return;
   }
 
-  dbStatusEl.textContent = '✅ Conectado a Supabase (SQL)';
+  dbStatusEl.textContent = '✅ SQLite listo (en memoria)';
   pintarTabla(data);
 }
 
@@ -192,13 +192,13 @@ formEl.addEventListener('submit', async (e) => {
 
   if (error) {
     console.error(error);
-    mostrarToast('Error al guardar en Supabase');
+    mostrarToast('Error al guardar en SQLite');
     return;
   }
 
   formEl.reset();
   document.getElementById('input-nombre').focus();
-  mostrarToast('Guardado en Supabase ✔');
+  mostrarToast('Guardado en Base de Datos ✔');
 });
 
 // Eliminar registro (DELETE FROM)
